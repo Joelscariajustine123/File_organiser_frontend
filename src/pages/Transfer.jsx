@@ -1,78 +1,107 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import QRCode from "react-qr-code";
-
-const BACKEND_URL = "https://file-organiser-backend.onrender.com"; // your deployed backend
 
 export default function Transfer({ uploadedFiles }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [email, setEmail] = useState("");
   const [result, setResult] = useState(null);
 
+  // Toggle selected files
   function toggleFile(filePath) {
     setSelectedFiles(prev =>
       prev.includes(filePath) ? prev.filter(f => f !== filePath) : [...prev, filePath]
     );
   }
 
+  // Send transfer request
   async function transfer() {
     if (!selectedFiles.length) return alert("Select files to transfer");
 
-    const res = await fetch(`${BACKEND_URL}/api/transfer`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ files: selectedFiles, email }),
-    });
+    try {
+      const res = await fetch("https://file-organiser-backend.onrender.com/api/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ files: selectedFiles, email }),
+      });
 
-    if (!res.ok) {
-      const err = await res.json();
-      return alert(err.error || "Transfer failed");
+      if (!res.ok) {
+        const err = await res.json();
+        return alert(err.error || "Transfer failed");
+      }
+
+      const data = await res.json();
+      setResult(data);
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to backend");
     }
-
-    const data = await res.json();
-    setResult(data);
   }
 
+  // Render uploaded file list
+  const fileList = uploadedFiles.length ? (
+    <div className="space-y-1">
+      {uploadedFiles.map((f, i) => (
+        <label key={i} className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={selectedFiles.includes(f)}
+            onChange={() => toggleFile(f)}
+          />
+          <span>{f.split("/").pop()}</span>
+        </label>
+      ))}
+    </div>
+  ) : (
+    <p>No uploaded files found</p>
+  );
+
   return (
-    <div>
+    <div className="p-4">
       <h2 className="text-2xl neon-text mb-4">File Transfer</h2>
 
       <div className="mb-4">
         <h3>Select files to transfer:</h3>
-        {uploadedFiles.length ? (
-          <div className="space-y-1">
-            {uploadedFiles.map((f, i) => (
-              <label key={i} className="flex items-center space-x-2">
-                <input type="checkbox" checked={selectedFiles.includes(f)} onChange={() => toggleFile(f)} />
-                <span>{f.split("/").pop()}</span>
-              </label>
-            ))}
-          </div>
-        ) : <p>No uploaded files found</p>}
+        {fileList}
       </div>
 
       <input
+        type="email"
         placeholder="Optional email to send link"
         value={email}
         onChange={e => setEmail(e.target.value)}
         className="w-full p-2 bg-black/40 rounded mb-2"
       />
 
-      <button onClick={transfer} className="px-4 py-2 border rounded mb-4">Create Transfer</button>
+      <button
+        onClick={transfer}
+        className="px-4 py-2 border rounded mb-4 bg-blue-600 text-white"
+      >
+        Create Transfer
+      </button>
 
-            {result && (
-        <div className="mt-4 file-card p-4 bg-black/30 rounded">
+      {result && (
+        <div className="mt-4 p-4 border rounded bg-gray-900 text-white">
           <div>
-            Link: <a href={BACKEND_URL + result.link} target="_blank" rel="noopener noreferrer" className="underline">{BACKEND_URL + result.link}</a>
+            <strong>Download Link:</strong>{" "}
+            <a href={`https://file-organiser-backend.onrender.com${result.link}`} target="_blank" rel="noopener noreferrer" className="underline">
+              {`https://file-organiser-backend.onrender.com${result.link}`}
+            </a>
           </div>
 
           <div className="mt-4">
-            <h4>QR Code:</h4>
-            <QRCode value={BACKEND_URL + result.link} size={128} />
+            <strong>QR Code:</strong>
+            <div className="mt-2 p-2 bg-white inline-block rounded">
+              <QRCode value={`https://file-organiser-backend.onrender.com${result.link}`} />
+            </div>
           </div>
 
           <div className="mt-4">
-            <a href={BACKEND_URL + result.link} target="_blank" rel="noopener noreferrer"
-               className="px-3 py-2 bg-white text-black rounded inline-block">
+            <a
+              href={`https://file-organiser-backend.onrender.com${result.link}`}
+              className="px-3 py-2 bg-green-500 text-white rounded"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Download ZIP
             </a>
           </div>
@@ -81,4 +110,3 @@ export default function Transfer({ uploadedFiles }) {
     </div>
   );
 }
-
