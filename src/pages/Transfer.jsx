@@ -14,7 +14,7 @@ export default function Transfer({ uploadedFiles }) {
 
   async function transfer() {
     if (!selectedFiles.length) return alert("Select files to transfer");
-    const res = await fetch("http://127.0.0.1:5001/api/transfer", {
+    const res = await fetch("https://file-organiser-backend.onrender.com/api/transfer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ files: selectedFiles, email }),
