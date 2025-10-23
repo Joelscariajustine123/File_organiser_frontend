@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import QRCode from "react-qr-code";
 
+const BACKEND_URL = "https://file-organiser-backend.onrender.com"; // your deployed backend
+
 export default function Transfer({ uploadedFiles }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [email, setEmail] = useState("");
@@ -14,11 +16,18 @@ export default function Transfer({ uploadedFiles }) {
 
   async function transfer() {
     if (!selectedFiles.length) return alert("Select files to transfer");
-    const res = await fetch("https://file-organiser-backend.onrender.com/api/transfer", {
+
+    const res = await fetch(`${BACKEND_URL}/api/transfer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ files: selectedFiles, email }),
     });
+
+    if (!res.ok) {
+      const err = await res.json();
+      return alert(err.error || "Transfer failed");
+    }
+
     const data = await res.json();
     setResult(data);
   }
@@ -50,16 +59,26 @@ export default function Transfer({ uploadedFiles }) {
 
       <button onClick={transfer} className="px-4 py-2 border rounded mb-4">Create Transfer</button>
 
-      {result && (
-        <div className="mt-4 file-card">
-          <div>Link: <a href={result.link} className="underline">{result.link}</a></div>
-          <div className="mt-2">QR Code:</div>
-          <div className="mt-2"><QRCode value={window.location.origin + result.link} /></div>
-          <div className="mt-2">
-            <a href={result.link} className="px-3 py-2 bg-white text-black rounded">Download ZIP</a>
+            {result && (
+        <div className="mt-4 file-card p-4 bg-black/30 rounded">
+          <div>
+            Link: <a href={BACKEND_URL + result.link} target="_blank" rel="noopener noreferrer" className="underline">{BACKEND_URL + result.link}</a>
+          </div>
+
+          <div className="mt-4">
+            <h4>QR Code:</h4>
+            <QRCode value={BACKEND_URL + result.link} size={128} />
+          </div>
+
+          <div className="mt-4">
+            <a href={BACKEND_URL + result.link} target="_blank" rel="noopener noreferrer"
+               className="px-3 py-2 bg-white text-black rounded inline-block">
+              Download ZIP
+            </a>
           </div>
         </div>
       )}
     </div>
   );
 }
+
