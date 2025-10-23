@@ -1,0 +1,28 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Neon-style custom classes */
+.neon-text{
+  text-shadow: 0 0 8px rgba(0,255,255,0.2), 0 0 20px rgba(0,128,255,0.15);
+  color: #7ef9ff;
+}
+.neon-link{
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(126,249,255,0.1);
+  text-decoration: none;
+  color: #9df3ff;
+}
+.neon-bg{
+  background: linear-gradient(135deg, rgba(8,6,23,1) 0%, rgba(7,0,22,1) 100%);
+}
+.shadow-neon{
+  box-shadow: 0 4px 30px rgba(0,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.02);
+}
+.file-card{
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+}
