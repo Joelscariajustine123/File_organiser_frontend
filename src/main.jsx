@@ -20,7 +20,7 @@ function App() {
           <nav className="space-x-4">
             <Link to="/" className="neon-link">Dashboard</Link>
             <Link to="/organize" className="neon-link">Organize</Link>
-            <Link to="/extract" className="neon-link">Extract</Link>
+            {/* <Link to="/extract" className="neon-link">Extract</Link> */}
             <Link to="/scan" className="neon-link">Scan</Link>
             <Link to="/transfer" className="neon-link">Transfer</Link>
           </nav>
